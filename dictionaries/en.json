@@ -1,0 +1,79 @@
+{
+  "header": {
+    "homeAria": "Balna home",
+    "startOver": "Start over",
+    "switchTo": "Switch to {language}"
+  },
+  "hero": {
+    "eyebrow": "Hand-picked thrift, ready to wear",
+    "title": "Find your fit in 3 quick taps.",
+    "subtitle": "No menus. No filters to fiddle with. Tell us who, what, and which size — we'll show only items that match."
+  },
+  "footer": {
+    "tagline": "Pre-loved branded thrift · Free message-to-buy on WhatsApp"
+  },
+  "quiz": {
+    "ariaLabel": "Find your fit in 3 steps",
+    "stepLabel": "Step {step} of 3",
+    "back": "← Back",
+    "step1": {
+      "title": "Who are you shopping for?",
+      "subtitle": "Pick one. We'll only show items that fit."
+    },
+    "step2": {
+      "title": "What type of item?",
+      "subtitle": "Tap the kind of thing you're looking for."
+    },
+    "step3": {
+      "title": "Select your preferred size(s)",
+      "subtitle": "You can pick more than one. Skip if you're not sure.",
+      "subtitleAccessories": "Most accessories are one size — just tap continue.",
+      "submit": "Show me items →",
+      "skipHint": "Not sure? Tap {cta} — we'll show every size."
+    }
+  },
+  "audience": {
+    "women": "Women",
+    "men": "Men",
+    "kids": "Kids"
+  },
+  "category": {
+    "shoes": "Shoes",
+    "jackets": "Jackets",
+    "shirts": "Shirts",
+    "pants": "Pants",
+    "accessories": "Accessories"
+  },
+  "size": {
+    "oneSize": "One Size",
+    "label": "Sizes"
+  },
+  "condition": {
+    "Like new": "Like new",
+    "Excellent": "Excellent",
+    "Very good": "Very good",
+    "Good": "Good"
+  },
+  "shop": {
+    "eyebrow": "Your picks",
+    "everything": "Everything",
+    "sizeJoiner": "size {sizes}",
+    "itemCount": "{count, plural, one {# item} other {# items}} in stock",
+    "empty": {
+      "title": "Nothing matches yet",
+      "body": "New arrivals drop every week. Try fewer sizes, or message us on WhatsApp and we'll keep an eye out for you.",
+      "cta": "Try the quiz again"
+    }
+  },
+  "product": {
+    "buy": "WhatsApp us to buy",
+    "savings": "−{percent}%"
+  },
+  "whatsapp": {
+    "intro": "Hi Balna! I'd like to buy:",
+    "labelSizes": "Size(s)",
+    "labelPrice": "Price",
+    "labelRef": "Ref",
+    "outro": "Is it still available?"
+  }
+}
