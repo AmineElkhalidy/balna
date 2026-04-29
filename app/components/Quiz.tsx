@@ -15,25 +15,38 @@ import {
 import type { Dictionary } from "@/lib/i18n";
 import type { Locale } from "@/lib/i18n-config";
 import { format } from "@/lib/format";
+import { BrandChip } from "./BrandChip";
 
-type Step = 1 | 2 | 3;
+type Step = 1 | 2 | 3 | 4;
+const TOTAL_STEPS = 4;
 
 interface QuizProps {
   lang: Locale;
   dict: Dictionary;
+  /**
+   * Map of `"audience:category"` → distinct brand names available for that
+   * combo. Pre-computed on the server (Sanity-aware) so the Quiz never has to
+   * fetch on the client.
+   */
+  brandIndex: Record<string, string[]>;
 }
 
 /**
- * "Guided Entry" quiz — three full-screen steps, one decision per screen.
+ * "Guided Entry" quiz — four full-screen steps, one decision per screen:
+ *   1. Audience  (Men / Kids)
+ *   2. Category  (Shoes / Jackets / …)
+ *   3. Brand     (multi-select, dynamically derived from in-stock items)
+ *   4. Size      (multi-select, audience-aware)
  *
- * Receives its dictionary as a prop so the same component renders correctly
- * in either locale without bundling both dictionaries on the client.
+ * Each StepShell is keyed on `step` so it remounts and replays the
+ * `step-enter` CSS animation on advance/back — no JS animation library needed.
  */
-export function Quiz({ lang, dict }: QuizProps) {
+export function Quiz({ lang, dict, brandIndex }: QuizProps) {
   const router = useRouter();
   const [step, setStep] = useState<Step>(1);
   const [audience, setAudience] = useState<Audience | null>(null);
   const [category, setCategory] = useState<Category | null>(null);
+  const [brands, setBrands] = useState<string[]>([]);
   const [sizes, setSizes] = useState<string[]>([]);
 
   const sizeOptions = useMemo<readonly string[]>(() => {
@@ -42,16 +55,30 @@ export function Quiz({ lang, dict }: QuizProps) {
     return [];
   }, [audience, category]);
 
+  /** Server-supplied brand list for the current audience + category. */
+  const brandOptions = useMemo<readonly string[]>(() => {
+    if (!audience || !category) return [];
+    return brandIndex[`${audience}:${category}`] ?? [];
+  }, [audience, category, brandIndex]);
+
   function pickAudience(a: Audience) {
     setAudience(a);
+    setBrands([]);
     setSizes([]);
     setStep(2);
   }
 
   function pickCategory(c: Category) {
     setCategory(c);
+    setBrands([]);
     setSizes(c === "accessories" ? [ACCESSORIES_SIZE] : []);
     setStep(3);
+  }
+
+  function toggleBrand(b: string) {
+    setBrands((prev) =>
+      prev.includes(b) ? prev.filter((x) => x !== b) : [...prev, b],
+    );
   }
 
   function toggleSize(s: string) {
@@ -65,6 +92,7 @@ export function Quiz({ lang, dict }: QuizProps) {
     const params = new URLSearchParams();
     params.set("for", audience);
     params.set("type", category);
+    if (brands.length > 0) params.set("brand", brands.join(","));
     if (sizes.length > 0) params.set("size", sizes.join(","));
     router.push(`/${lang}/shop?${params.toString()}`);
   }
@@ -79,9 +107,10 @@ export function Quiz({ lang, dict }: QuizProps) {
       <div className="mx-auto flex w-full max-w-3xl flex-1 flex-col px-5 pb-10 pt-6 sm:px-8">
         {step === 1 && (
           <StepShell
-            eyebrow={format(dict.quiz.stepLabel, { step: 1 })}
-            title={dict.quiz.step1.title}
-            subtitle={dict.quiz.step1.subtitle}
+            key="audience"
+            eyebrow={format(dict.quiz.stepLabel, { step: 1, total: TOTAL_STEPS })}
+            title={dict.quiz.audience.title}
+            subtitle={dict.quiz.audience.subtitle}
           >
             <div className="grid grid-cols-2 gap-4">
               {AUDIENCES.map((a) => (
@@ -99,9 +128,10 @@ export function Quiz({ lang, dict }: QuizProps) {
 
         {step === 2 && (
           <StepShell
-            eyebrow={format(dict.quiz.stepLabel, { step: 2 })}
-            title={dict.quiz.step2.title}
-            subtitle={dict.quiz.step2.subtitle}
+            key="category"
+            eyebrow={format(dict.quiz.stepLabel, { step: 2, total: TOTAL_STEPS })}
+            title={dict.quiz.category.title}
+            subtitle={dict.quiz.category.subtitle}
             backLabel={dict.quiz.back}
             onBack={() => setStep(1)}
           >
@@ -121,15 +151,78 @@ export function Quiz({ lang, dict }: QuizProps) {
 
         {step === 3 && (
           <StepShell
-            eyebrow={format(dict.quiz.stepLabel, { step: 3 })}
-            title={dict.quiz.step3.title}
-            subtitle={
-              category === "accessories"
-                ? dict.quiz.step3.subtitleAccessories
-                : dict.quiz.step3.subtitle
-            }
+            key="brand"
+            eyebrow={format(dict.quiz.stepLabel, { step: 3, total: TOTAL_STEPS })}
+            title={dict.quiz.brand.title}
+            subtitle={dict.quiz.brand.subtitle}
             backLabel={dict.quiz.back}
             onBack={() => setStep(2)}
+          >
+            {brandOptions.length === 0 ? (
+              <BrandEmpty
+                dict={dict}
+                onContinue={() => {
+                  setBrands([]);
+                  setStep(4);
+                }}
+              />
+            ) : (
+              <>
+                <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 sm:gap-4">
+                  {brandOptions.map((b) => (
+                    <BrandChip
+                      key={b}
+                      brand={b}
+                      selected={brands.includes(b)}
+                      onClick={() => toggleBrand(b)}
+                    />
+                  ))}
+                </div>
+
+                <div className="mt-10 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                  <button
+                    type="button"
+                    onClick={() => setStep(4)}
+                    className="inline-flex h-14 items-center justify-center rounded-full bg-balna-navy px-7 text-base font-semibold text-white shadow-[var(--shadow-card)] transition hover:bg-balna-navy-dark active:scale-[0.99]"
+                  >
+                    {dict.quiz.brand.continue}
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setBrands([]);
+                      setStep(4);
+                    }}
+                    className="text-sm font-semibold text-balna-muted underline-offset-4 hover:text-balna-ink hover:underline"
+                  >
+                    {dict.quiz.brand.skip}
+                  </button>
+                </div>
+
+                <p className="mt-4 text-sm text-balna-muted">
+                  {brands.length === 0
+                    ? dict.quiz.brand.noneSelectedHint
+                    : format(dict.quiz.brand.selectionHint, {
+                        count: brands.length,
+                      })}
+                </p>
+              </>
+            )}
+          </StepShell>
+        )}
+
+        {step === 4 && (
+          <StepShell
+            key="size"
+            eyebrow={format(dict.quiz.stepLabel, { step: 4, total: TOTAL_STEPS })}
+            title={dict.quiz.size.title}
+            subtitle={
+              category === "accessories"
+                ? dict.quiz.size.subtitleAccessories
+                : dict.quiz.size.subtitle
+            }
+            backLabel={dict.quiz.back}
+            onBack={() => setStep(3)}
           >
             <div className="flex flex-wrap gap-3">
               {sizeOptions.map((s) => {
@@ -161,12 +254,12 @@ export function Quiz({ lang, dict }: QuizProps) {
                 onClick={submit}
                 className="inline-flex h-14 items-center justify-center rounded-full bg-balna-navy px-7 text-base font-semibold text-white shadow-[var(--shadow-card)] transition hover:bg-balna-navy-dark active:scale-[0.99]"
               >
-                {dict.quiz.step3.submit}
+                {dict.quiz.size.submit}
               </button>
               {sizes.length === 0 && category !== "accessories" && (
                 <p className="text-sm text-balna-muted">
-                  {format(dict.quiz.step3.skipHint, {
-                    cta: dict.quiz.step3.submit.replace(/[→←]/g, "").trim(),
+                  {format(dict.quiz.size.skipHint, {
+                    cta: dict.quiz.size.submit.replace(/[→←]/g, "").trim(),
                   })}
                 </p>
               )}
@@ -181,13 +274,13 @@ export function Quiz({ lang, dict }: QuizProps) {
 /* ────────────────────────────────────────────────────────────────────────── */
 
 function ProgressBar({ step }: { step: Step }) {
-  const pct = (step / 3) * 100;
+  const pct = (step / TOTAL_STEPS) * 100;
   return (
     <div
       className="h-1.5 w-full bg-balna-line"
       role="progressbar"
       aria-valuemin={0}
-      aria-valuemax={3}
+      aria-valuemax={TOTAL_STEPS}
       aria-valuenow={step}
     >
       <div
@@ -214,7 +307,7 @@ function StepShell({
   children: React.ReactNode;
 }) {
   return (
-    <div className="flex flex-1 flex-col">
+    <div className="step-enter flex flex-1 flex-col">
       <div className="flex items-center justify-between">
         <p className="text-xs font-semibold uppercase tracking-[0.18em] text-balna-teal-dark">
           {eyebrow}
@@ -271,5 +364,34 @@ function BigCard({
         {label}
       </span>
     </button>
+  );
+}
+
+function BrandEmpty({
+  dict,
+  onContinue,
+}: {
+  dict: Dictionary;
+  onContinue: () => void;
+}) {
+  return (
+    <div className="rounded-3xl border-2 border-dashed border-balna-line bg-white p-6 text-center">
+      <span aria-hidden className="text-4xl">
+        🪧
+      </span>
+      <h2 className="mt-3 text-lg font-bold text-balna-ink">
+        {dict.quiz.brand.empty.title}
+      </h2>
+      <p className="mt-2 text-sm text-balna-muted">
+        {dict.quiz.brand.empty.body}
+      </p>
+      <button
+        type="button"
+        onClick={onContinue}
+        className="mt-5 inline-flex h-12 items-center justify-center rounded-full bg-balna-navy px-6 font-semibold text-white hover:bg-balna-navy-dark"
+      >
+        {dict.quiz.brand.empty.cta}
+      </button>
+    </div>
   );
 }

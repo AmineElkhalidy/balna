@@ -2,6 +2,7 @@ import { notFound } from "next/navigation";
 import { Header } from "../components/Header";
 import { Quiz } from "../components/Quiz";
 import { getDictionary, hasLocale, type Dictionary } from "@/lib/i18n";
+import { getBrandIndex } from "@/lib/sanity/products";
 
 export default async function Home({
   params,
@@ -10,13 +11,18 @@ export default async function Home({
 }) {
   const { lang } = await params;
   if (!hasLocale(lang)) notFound();
-  const dict = await getDictionary(lang);
+
+  // Run dict + brand index in parallel — both are cheap (60s ISR for Sanity).
+  const [dict, brandIndex] = await Promise.all([
+    getDictionary(lang),
+    getBrandIndex(),
+  ]);
 
   return (
     <>
       <Header lang={lang} dict={dict} />
       <Hero dict={dict} />
-      <Quiz lang={lang} dict={dict} />
+      <Quiz lang={lang} dict={dict} brandIndex={brandIndex} />
       <FooterNote dict={dict} />
     </>
   );

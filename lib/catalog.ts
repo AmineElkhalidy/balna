@@ -29,6 +29,16 @@ export const ACCESSORIES_SIZE = "One Size";
 
 export type Condition = "Like new" | "Excellent" | "Very good" | "Good";
 
+export interface ProductImage {
+  /** Pre-built CDN URL. Pass through `next/image` `unoptimized` if you don't want re-encoding. */
+  url: string;
+  /** Base64 placeholder from Sanity's image pipeline, used as `next/image` blur. */
+  lqip: string | null;
+  alt: string;
+  width: number | null;
+  height: number | null;
+}
+
 export interface Product {
   id: string;
   title: string;
@@ -44,6 +54,12 @@ export interface Product {
   condition: Condition;
   /** Color emoji + soft background tone for the placeholder thumbnail. */
   accent: { emoji: string; bg: string };
+  /** Real photos from Sanity. When empty/undefined, the emoji placeholder is shown. */
+  images?: readonly ProductImage[];
+  /** Marked sold by an editor. Filtered out at the data layer, but useful for previews. */
+  isSoldOut?: boolean;
+  /** Optional copy from the editor — defects, fit, fabric. */
+  description?: string;
 }
 
 const P = (p: Product): Product => p;
@@ -177,6 +193,8 @@ export const PRODUCTS: readonly Product[] = [
 export interface QuizFilter {
   audience?: Audience;
   category?: Category;
+  /** Optional list of brand names. Empty / missing means "any brand". */
+  brands?: readonly string[];
   sizes?: readonly string[];
 }
 
@@ -187,15 +205,42 @@ export function filterProducts(
 ): Product[] {
   const wantedSizes =
     filter.sizes && filter.sizes.length > 0 ? filter.sizes : null;
+  const wantedBrands =
+    filter.brands && filter.brands.length > 0 ? new Set(filter.brands) : null;
 
   return products.filter((p) => {
     if (filter.audience && p.audience !== filter.audience) return false;
     if (filter.category && p.category !== filter.category) return false;
+    if (wantedBrands && !wantedBrands.has(p.brand)) return false;
     if (wantedSizes && !p.sizes.some((s) => wantedSizes.includes(s)))
       return false;
     return true;
   });
 }
+
+/**
+ * Distinct, sorted list of brand names available for the given audience +
+ * category combination. Empty list means "no products matched". The Quiz uses
+ * this to render Step 3 dynamically — only brands actually in stock for the
+ * shopper's audience+category get shown.
+ */
+export function availableBrands(
+  filter: Pick<QuizFilter, "audience" | "category">,
+  products: readonly Product[] = PRODUCTS,
+): string[] {
+  const set = new Set<string>();
+  for (const p of products) {
+    if (filter.audience && p.audience !== filter.audience) continue;
+    if (filter.category && p.category !== filter.category) continue;
+    set.add(p.brand);
+  }
+  return [...set].sort((a, b) => a.localeCompare(b));
+}
+
+/** Every brand that appears anywhere in the catalog. */
+export const BRANDS: readonly string[] = [
+  ...new Set(PRODUCTS.map((p) => p.brand)),
+].sort((a, b) => a.localeCompare(b));
 
 /** Pretty labels for UI. Keep separate from the data so URLs stay lowercase. */
 export const AUDIENCE_LABEL: Record<Audience, string> = {
@@ -223,3 +268,32 @@ export const AUDIENCE_EMOJI: Record<Audience, string> = {
   men: "👨",
   kids: "🧒",
 };
+
+/**
+ * Visual style for each brand chip — background, foreground, and an optional
+ * short "wordmark" label (e.g. "TNF" for The North Face). Unknown brands fall
+ * back to a neutral teal/navy chip via {@link getBrandStyle}.
+ */
+export interface BrandStyle {
+  bg: string;
+  fg: string;
+  /** Override for the visible label inside the chip (defaults to the brand name). */
+  mark?: string;
+}
+
+export const BRAND_META: Record<string, BrandStyle> = {
+  Nike: { bg: "#0a0a0a", fg: "#ffffff" },
+  Adidas: { bg: "#000000", fg: "#ffffff", mark: "adidas" },
+  "The North Face": { bg: "#1a1a1a", fg: "#ffffff", mark: "TNF" },
+  Patagonia: { bg: "#0c2c54", fg: "#ffffff" },
+  Uniqlo: { bg: "#bf0000", fg: "#ffffff", mark: "UNIQLO" },
+  Carhartt: { bg: "#f5a800", fg: "#1a1a1a" },
+  "Ray-Ban": { bg: "#0a0a0a", fg: "#ffffff" },
+  GAP: { bg: "#002868", fg: "#ffffff" },
+  "H&M": { bg: "#e50010", fg: "#ffffff" },
+  Vans: { bg: "#0a0a0a", fg: "#ffffff", mark: "VANS" },
+};
+
+export function getBrandStyle(brand: string): BrandStyle {
+  return BRAND_META[brand] ?? { bg: "#1a2a52", fg: "#ffffff" };
+}

@@ -5,18 +5,21 @@ import { ProductCard } from "../../components/ProductCard";
 import {
   AUDIENCES,
   CATEGORIES,
-  filterProducts,
   type Audience,
   type Category,
   type QuizFilter,
 } from "@/lib/catalog";
 import { getDictionary, hasLocale, type Dictionary } from "@/lib/i18n";
 import { format } from "@/lib/format";
+import { getProducts, getSiteSettings } from "@/lib/sanity/products";
 
 /**
- * Filtered catalog page — `/{lang}/shop?for=women&type=jackets&size=S,M`.
- * Server-rendered: searchParams turn into a typed filter, products render
- * with the requested locale, every CTA already speaks the user's language.
+ * Filtered catalog page — `/{lang}/shop?for=men&type=jackets&size=S,M`.
+ *
+ * The filter is parsed from `searchParams`, executed against Sanity (or the
+ * local fixture if Sanity isn't configured), and the results are rendered
+ * server-side. Site settings (WhatsApp number + bank details) are also fetched
+ * here and threaded down so each product card knows where to send the buyer.
  */
 export default async function ShopPage({
   params,
@@ -30,8 +33,11 @@ export default async function ShopPage({
 
   const sp = await searchParams;
   const filter = parseFilter(sp);
-  const results = filterProducts(filter);
-  const dict = await getDictionary(lang);
+  const [dict, results, settings] = await Promise.all([
+    getDictionary(lang),
+    getProducts(filter),
+    getSiteSettings(),
+  ]);
 
   return (
     <>
@@ -56,7 +62,13 @@ export default async function ShopPage({
         ) : (
           <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 sm:gap-6 lg:grid-cols-4">
             {results.map((p) => (
-              <ProductCard key={p.id} product={p} lang={lang} dict={dict} />
+              <ProductCard
+                key={p.id}
+                product={p}
+                lang={lang}
+                dict={dict}
+                settings={settings}
+              />
             ))}
           </div>
         )}
@@ -72,12 +84,20 @@ function parseFilter(sp: {
 }): QuizFilter {
   const audience = pick(sp.for, AUDIENCES) as Audience | undefined;
   const category = pick(sp.type, CATEGORIES) as Category | undefined;
-  const sizeRaw = typeof sp.size === "string" ? sp.size : "";
-  const sizes = sizeRaw
+  const sizes = splitList(sp.size);
+  // Brand strings come from a curated quiz selection, but a tampered URL is
+  // still safe — Sanity's GROQ params are pre-bound, so passing an unknown
+  // brand simply matches no products.
+  const brands = splitList(sp.brand);
+  return { audience, category, brands, sizes };
+}
+
+function splitList(v: string | string[] | undefined): string[] {
+  const raw = typeof v === "string" ? v : "";
+  return raw
     .split(",")
     .map((s) => s.trim())
     .filter(Boolean);
-  return { audience, category, sizes };
 }
 
 function pick<T extends string>(
@@ -103,6 +123,11 @@ function FilterSummary({
   const parts: string[] = [];
   if (filter.audience) parts.push(dict.audience[filter.audience]);
   if (filter.category) parts.push(dict.category[filter.category]);
+  if (filter.brands && filter.brands.length) {
+    parts.push(
+      format(dict.shop.brandJoiner, { brands: filter.brands.join(", ") }),
+    );
+  }
   if (filter.sizes && filter.sizes.length) {
     parts.push(format(dict.shop.sizeJoiner, { sizes: filter.sizes.join(", ") }));
   }

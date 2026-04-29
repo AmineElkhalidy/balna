@@ -6,25 +6,38 @@
   },
   "hero": {
     "eyebrow": "Hand-picked thrift, ready to wear",
-    "title": "Find your fit in 3 quick taps.",
-    "subtitle": "No menus. No filters to fiddle with. Tell us who, what, and which size — we'll show only items that match."
+    "title": "Find your fit in 4 quick taps.",
+    "subtitle": "No menus. No filters to fiddle with. Tell us who, what, the brand and the size — we'll show only items that match."
   },
   "footer": {
     "tagline": "Pre-loved branded thrift · Free message-to-buy on WhatsApp"
   },
   "quiz": {
-    "ariaLabel": "Find your fit in 3 steps",
-    "stepLabel": "Step {step} of 3",
+    "ariaLabel": "Find your fit in 4 steps",
+    "stepLabel": "Step {step} of {total}",
     "back": "← Back",
-    "step1": {
+    "audience": {
       "title": "Who are you shopping for?",
       "subtitle": "Pick one. We'll only show items that fit."
     },
-    "step2": {
+    "category": {
       "title": "What type of item?",
       "subtitle": "Tap the kind of thing you're looking for."
     },
-    "step3": {
+    "brand": {
+      "title": "Any brand preference?",
+      "subtitle": "Tap one or many. Skip to see every brand we have.",
+      "continue": "Continue →",
+      "skip": "Skip — show all brands",
+      "selectionHint": "{count, plural, one {# brand selected} other {# brands selected}} · tap a chip to remove it",
+      "noneSelectedHint": "No brand picked? That's fine — we'll show every brand.",
+      "empty": {
+        "title": "No brands in this combo yet",
+        "body": "We don't have anything matching that combo right now. Skip to size and we'll keep an eye out — or tap back to try a different category.",
+        "cta": "Skip to size →"
+      }
+    },
+    "size": {
       "title": "Select your preferred size(s)",
       "subtitle": "You can pick more than one. Skip if you're not sure.",
       "subtitleAccessories": "Most accessories are one size — just tap continue.",
@@ -57,16 +70,40 @@
     "eyebrow": "Your picks",
     "everything": "Everything",
     "sizeJoiner": "size {sizes}",
+    "brandJoiner": "{brands}",
     "itemCount": "{count, plural, one {# item} other {# items}} in stock",
     "empty": {
       "title": "Nothing matches yet",
-      "body": "New arrivals drop every week. Try fewer sizes, or message us on WhatsApp and we'll keep an eye out for you.",
+      "body": "New arrivals drop every week. Try fewer filters, or message us on WhatsApp and we'll keep an eye out for you.",
       "cta": "Try the quiz again"
     }
   },
   "product": {
-    "buy": "WhatsApp us to buy",
-    "savings": "−{percent}%"
+    "buy": "Buy this piece",
+    "savings": "−{percent}%",
+    "soldOut": "Sold out"
+  },
+  "checkout": {
+    "close": "Close",
+    "tabs": {
+      "whatsapp": "WhatsApp",
+      "bank": "Bank transfer"
+    },
+    "whatsapp": {
+      "body": "Tap below to open WhatsApp with a pre-filled message. We'll confirm availability and send you a payment link.",
+      "cta": "Open WhatsApp"
+    },
+    "bank": {
+      "bankName": "Bank",
+      "accountHolder": "Account holder",
+      "iban": "IBAN",
+      "swift": "SWIFT / BIC",
+      "reference": "Use this reference",
+      "copy": "Copy",
+      "copied": "Copied",
+      "unavailable": "Bank transfer details aren't available right now. Please reach out on WhatsApp instead."
+    },
+    "referenceFooter": "Quote reference {ref} so we can match the transfer to this exact piece."
   },
   "whatsapp": {
     "intro": "Hi Balna! I'd like to buy:",

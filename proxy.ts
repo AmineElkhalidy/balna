@@ -41,6 +41,10 @@ export function proxy(req: NextRequest) {
 }
 
 export const config = {
-  // Skip Next internals, the favicon, the logo, and any file with an extension.
-  matcher: ["/((?!_next/|api/|favicon\\.ico|logo\\.png|.*\\..*).*)"],
+  // Skip Next internals, the favicon, the logo, the embedded Sanity studio,
+  // and any file with an extension. Capturing groups aren't allowed in the
+  // matcher source, so anchors use non-capturing `(?:…)` groups.
+  matcher: [
+    "/((?!_next/|api/|studio(?:/|$)|favicon\\.ico|logo\\.png|.*\\..*).*)",
+  ],
 };
