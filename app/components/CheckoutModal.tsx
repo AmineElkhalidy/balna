@@ -42,6 +42,17 @@ export function CheckoutModal({
   const titleId = useId();
   const [tab, setTab] = useState<Tab>("whatsapp");
 
+  // Reset the tab to "whatsapp" whenever the modal re-opens with a different
+  // product. Done during render (rather than in an effect) per the React 19
+  // guidance — derived state changes don't need an effect, and doing it here
+  // avoids an extra commit + flash of the previous tab on first paint.
+  const signature = `${open ? 1 : 0}:${product.id}`;
+  const [lastSignature, setLastSignature] = useState(signature);
+  if (lastSignature !== signature) {
+    setLastSignature(signature);
+    if (open) setTab("whatsapp");
+  }
+
   useEffect(() => {
     const node = dialogRef.current;
     if (!node) return;
@@ -55,11 +66,6 @@ export function CheckoutModal({
       node.close();
     }
   }, [open]);
-
-  // Reset to WhatsApp tab whenever a new product is opened.
-  useEffect(() => {
-    if (open) setTab("whatsapp");
-  }, [open, product.id]);
 
   const c = dict.checkout;
   const bank = settings.bankTransfer;

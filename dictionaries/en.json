@@ -72,6 +72,10 @@
     "sizeJoiner": "size {sizes}",
     "brandJoiner": "{brands}",
     "itemCount": "{count, plural, one {# item} other {# items}} in stock",
+    "metadataTitle": "{summary} · Pre-loved thrift",
+    "metadataTitleFallback": "Shop pre-loved branded thrift",
+    "metadataDescription": "Hand-picked {summary} from Balna's pre-loved collection. Buy via WhatsApp or bank transfer — every piece is one of one.",
+    "metadataDescriptionFallback": "Browse the full Balna pre-loved collection. Every piece is one of one — buy via WhatsApp or bank transfer.",
     "empty": {
       "title": "Nothing matches yet",
       "body": "New arrivals drop every week. Try fewer filters, or message us on WhatsApp and we'll keep an eye out for you.",

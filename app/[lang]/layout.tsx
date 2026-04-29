@@ -8,6 +8,7 @@ import {
   LOCALE_META,
   hasLocale,
 } from "@/lib/i18n";
+import { BASE_KEYWORDS, SITE_NAME, SITE_URL, hreflangMap } from "@/lib/seo";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -28,20 +29,34 @@ const arabic = Cairo({
   weight: ["500", "600", "700", "800"],
 });
 
-const siteUrl =
-  process.env.NEXT_PUBLIC_SITE_URL || "https://balna.example.com";
-
 const titles: Record<string, { title: string; description: string }> = {
   en: {
     title: "Balna — Pre-loved branded thrift, made simple",
     description:
-      "Shop pre-owned branded clothing from Balna. Answer 3 quick questions and we show you only what fits.",
+      "Shop pre-owned branded clothing from Balna. Answer 4 quick questions and we show you only what fits — buy via WhatsApp or bank transfer.",
   },
   ar: {
     title: "Balna — حوايج ماركات مستعملة، بسيطة وسهلة",
     description:
-      "تسوق حوايج ماركات مستعملة من Balna. جاوب على 3 أسئلة وغانوريوك غير اللي يناسبك.",
+      "تسوق حوايج ماركات مستعملة من Balna. جاوب على 4 أسئلة وغانوريوك غير اللي يناسبك — شراء عبر واتساب ولا تحويل بنكي.",
   },
+};
+
+const localeKeywords: Record<string, string[]> = {
+  en: [
+    "thrift store",
+    "pre-loved fashion",
+    "branded thrift",
+    "vintage clothing Morocco",
+    "WhatsApp shop",
+  ],
+  ar: [
+    "حوايج مستعملة",
+    "ماركات مستعملة",
+    "ثوب مستعمل",
+    "تسوق على واتساب",
+    "Balna",
+  ],
 };
 
 export async function generateMetadata({
@@ -52,31 +67,81 @@ export async function generateMetadata({
   const { lang } = await params;
   const key = hasLocale(lang) ? lang : DEFAULT_LOCALE;
   const meta = titles[key];
+  const ogLocale = LOCALE_META[key].htmlLang;
+  const ogLocaleAlternate = LOCALES.filter((l) => l !== key).map(
+    (l) => LOCALE_META[l].htmlLang,
+  );
+
   return {
-    metadataBase: new URL(siteUrl),
-    title: meta.title,
+    metadataBase: new URL(SITE_URL),
+    title: {
+      default: meta.title,
+      // Inner pages opt into the brand-suffixed pattern via `title: "Foo"`
+      // and end up rendering as "Foo · Balna".
+      template: `%s · ${SITE_NAME}`,
+    },
     description: meta.description,
-    applicationName: "Balna",
-    icons: { icon: "/logo.png", apple: "/logo.png" },
+    applicationName: SITE_NAME,
+    referrer: "origin-when-cross-origin",
+    creator: SITE_NAME,
+    publisher: SITE_NAME,
+    category: "shopping",
+    keywords: [...BASE_KEYWORDS, ...(localeKeywords[key] ?? [])],
+    formatDetection: {
+      // The WhatsApp deep-link contains a phone number; iOS Safari otherwise
+      // styles every digit as a tappable phone link in the page body.
+      telephone: false,
+      address: false,
+      email: false,
+    },
+    icons: {
+      icon: [
+        { url: "/logo.png", type: "image/png" },
+        { url: "/favicon.ico", sizes: "any" },
+      ],
+      apple: { url: "/logo.png", sizes: "180x180", type: "image/png" },
+    },
     alternates: {
       canonical: `/${key}`,
-      languages: {
-        en: "/en",
-        "ar-MA": "/ar",
-      },
+      languages: hreflangMap((l) => `/${l}`),
     },
     openGraph: {
+      type: "website",
+      siteName: SITE_NAME,
       title: meta.title,
       description: meta.description,
-      images: ["/logo.png"],
-      locale: LOCALE_META[key].htmlLang,
-      type: "website",
+      url: `/${key}`,
+      locale: ogLocale,
+      alternateLocale: ogLocaleAlternate,
+      // `images` is auto-populated from `app/[lang]/opengraph-image.tsx` —
+      // omitting the field here makes Next inject the dynamic card.
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: meta.title,
+      description: meta.description,
+      // Likewise, the dynamic `twitter-image.tsx` is auto-detected.
+    },
+    robots: {
+      index: true,
+      follow: true,
+      googleBot: {
+        index: true,
+        follow: true,
+        "max-image-preview": "large",
+        "max-snippet": -1,
+        "max-video-preview": -1,
+      },
     },
   };
 }
 
 export const viewport: Viewport = {
-  themeColor: "#11b79f",
+  themeColor: [
+    { media: "(prefers-color-scheme: light)", color: "#11b79f" },
+    { media: "(prefers-color-scheme: dark)", color: "#0c9281" },
+  ],
+  colorScheme: "light",
   width: "device-width",
   initialScale: 1,
   viewportFit: "cover",

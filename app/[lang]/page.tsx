@@ -2,7 +2,9 @@ import { notFound } from "next/navigation";
 import { Header } from "../components/Header";
 import { Quiz } from "../components/Quiz";
 import { getDictionary, hasLocale, type Dictionary } from "@/lib/i18n";
-import { getBrandIndex } from "@/lib/sanity/products";
+import { getBrandIndex, getSiteSettings } from "@/lib/sanity/products";
+import { SITE_NAME, SITE_URL, absoluteUrl, jsonLdString } from "@/lib/seo";
+import { LOCALE_META, type Locale } from "@/lib/i18n-config";
 
 export default async function Home({
   params,
@@ -12,20 +14,79 @@ export default async function Home({
   const { lang } = await params;
   if (!hasLocale(lang)) notFound();
 
-  // Run dict + brand index in parallel — both are cheap (60s ISR for Sanity).
-  const [dict, brandIndex] = await Promise.all([
+  // Run dict + brand index + site settings in parallel.
+  const [dict, brandIndex, settings] = await Promise.all([
     getDictionary(lang),
     getBrandIndex(),
+    getSiteSettings(),
   ]);
+
+  const phone = settings?.whatsappNumber ?? process.env.NEXT_PUBLIC_BALNA_WHATSAPP;
+  const orgLd = buildOrganizationLd(lang, dict, phone);
+  const siteLd = buildWebsiteLd(lang, dict);
 
   return (
     <>
+      {/* JSON-LD must live in the body of the document — Next streams it
+          alongside the route output. Keep both blobs as separate scripts so
+          Google can parse them independently. */}
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: jsonLdString(orgLd) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: jsonLdString(siteLd) }}
+      />
       <Header lang={lang} dict={dict} />
       <Hero dict={dict} />
       <Quiz lang={lang} dict={dict} brandIndex={brandIndex} />
       <FooterNote dict={dict} />
     </>
   );
+}
+
+function buildOrganizationLd(
+  lang: Locale,
+  dict: Dictionary,
+  phone: string | undefined,
+) {
+  return {
+    "@context": "https://schema.org",
+    "@type": "Organization",
+    "@id": `${SITE_URL}/#organization`,
+    name: SITE_NAME,
+    url: SITE_URL,
+    logo: absoluteUrl("/logo.png"),
+    description: dict.footer.tagline,
+    inLanguage: LOCALE_META[lang].htmlLang,
+    ...(phone
+      ? {
+          contactPoint: [
+            {
+              "@type": "ContactPoint",
+              contactType: "customer service",
+              telephone: `+${phone.replace(/\D/g, "")}`,
+              availableLanguage: ["en", "ar"],
+              areaServed: "MA",
+            },
+          ],
+        }
+      : {}),
+  };
+}
+
+function buildWebsiteLd(lang: Locale, dict: Dictionary) {
+  return {
+    "@context": "https://schema.org",
+    "@type": "WebSite",
+    "@id": `${SITE_URL}/#website`,
+    name: SITE_NAME,
+    url: absoluteUrl(`/${lang}`),
+    description: dict.hero.subtitle,
+    inLanguage: LOCALE_META[lang].htmlLang,
+    publisher: { "@id": `${SITE_URL}/#organization` },
+  };
 }
 
 function Hero({ dict }: { dict: Dictionary }) {

@@ -72,6 +72,10 @@
     "sizeJoiner": "قياس {sizes}",
     "brandJoiner": "{brands}",
     "itemCount": "{count, plural, one {قطعة وحدة} other {# قطع}} موجودة",
+    "metadataTitle": "{summary} · حوايج مستعملة",
+    "metadataTitleFallback": "تسوق حوايج ماركات مستعملة",
+    "metadataDescription": "حوايج {summary} منقاة بيدنا من Balna. شراء عبر واتساب ولا تحويل بنكي — كل قطعة فريدة.",
+    "metadataDescriptionFallback": "تصفح كاع الكوليكسيون ديال Balna للحوايج المستعملة. كل قطعة فريدة — شراء عبر واتساب ولا تحويل بنكي.",
     "empty": {
       "title": "ما لقيناش حتى حاجة",
       "body": "كاينين حوايج جداد كل سيمانة. جرب تنقص من الفلترات، ولا صيفط لنا واتساب وغانتسناوك.",

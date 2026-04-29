@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Header } from "../../components/Header";
@@ -7,11 +8,25 @@ import {
   CATEGORIES,
   type Audience,
   type Category,
+  type Product,
   type QuizFilter,
 } from "@/lib/catalog";
-import { getDictionary, hasLocale, type Dictionary } from "@/lib/i18n";
+import {
+  DEFAULT_LOCALE,
+  getDictionary,
+  hasLocale,
+  type Dictionary,
+} from "@/lib/i18n";
 import { format } from "@/lib/format";
 import { getProducts, getSiteSettings } from "@/lib/sanity/products";
+import {
+  SITE_NAME,
+  SITE_URL,
+  absoluteUrl,
+  hreflangMap,
+  jsonLdString,
+} from "@/lib/seo";
+import { LOCALE_META, type Locale } from "@/lib/i18n-config";
 
 /**
  * Filtered catalog page — `/{lang}/shop?for=men&type=jackets&size=S,M`.
@@ -21,6 +36,57 @@ import { getProducts, getSiteSettings } from "@/lib/sanity/products";
  * server-side. Site settings (WhatsApp number + bank details) are also fetched
  * here and threaded down so each product card knows where to send the buyer.
  */
+export async function generateMetadata({
+  params,
+  searchParams,
+}: {
+  params: Promise<{ lang: string }>;
+  searchParams: Promise<{ [k: string]: string | string[] | undefined }>;
+}): Promise<Metadata> {
+  const { lang } = await params;
+  const key = hasLocale(lang) ? lang : DEFAULT_LOCALE;
+  const sp = await searchParams;
+  const filter = parseFilter(sp);
+  const dict = await getDictionary(key);
+
+  const summary = buildSummary(filter, dict);
+  const title = summary
+    ? format(dict.shop.metadataTitle, { summary })
+    : dict.shop.metadataTitleFallback;
+  const description = summary
+    ? format(dict.shop.metadataDescription, { summary })
+    : dict.shop.metadataDescriptionFallback;
+
+  // Filtered SERPs are not canonical destinations — search engines should
+  // index the unfiltered shop and follow our internal links. We let the
+  // robots crawl the *filtered* views (so the products inside are found),
+  // but we set the canonical to /shop and add `noindex` only to filtered
+  // permutations. That keeps PageRank flowing while preventing duplicates.
+  const isFiltered = Object.keys(sp).length > 0;
+  const canonicalPath = `/${key}/shop`;
+
+  return {
+    title,
+    description,
+    alternates: {
+      canonical: canonicalPath,
+      languages: hreflangMap((l) => `/${l}/shop`),
+    },
+    openGraph: {
+      type: "website",
+      title,
+      description,
+      url: canonicalPath,
+      siteName: SITE_NAME,
+      locale: LOCALE_META[key].htmlLang,
+    },
+    twitter: { card: "summary_large_image", title, description },
+    robots: isFiltered
+      ? { index: false, follow: true }
+      : { index: true, follow: true },
+  };
+}
+
 export default async function ShopPage({
   params,
   searchParams,
@@ -39,8 +105,17 @@ export default async function ShopPage({
     getSiteSettings(),
   ]);
 
+  const itemListLd = buildItemListLd(lang, results, dict);
+
   return (
     <>
+      {results.length > 0 && (
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: jsonLdString(itemListLd) }}
+        />
+      )}
+
       <Header
         lang={lang}
         dict={dict}
@@ -75,6 +150,83 @@ export default async function ShopPage({
       </main>
     </>
   );
+}
+
+/* ────────────────────────────────────────────────────────────────────────── */
+
+/** Pretty, comma-joined description of the active filter (or "" if none). */
+function buildSummary(filter: QuizFilter, dict: Dictionary): string {
+  const parts: string[] = [];
+  if (filter.audience) parts.push(dict.audience[filter.audience]);
+  if (filter.category) parts.push(dict.category[filter.category]);
+  if (filter.brands?.length) {
+    parts.push(
+      format(dict.shop.brandJoiner, { brands: filter.brands.join(", ") }),
+    );
+  }
+  if (filter.sizes?.length) {
+    parts.push(format(dict.shop.sizeJoiner, { sizes: filter.sizes.join(", ") }));
+  }
+  return parts.join(" · ");
+}
+
+/**
+ * https://schema.org/ItemList — Google uses this to render carousel rich
+ * results. Each entry is a fully-fledged Product with offers + brand so the
+ * crawler can show price + availability inline.
+ */
+function buildItemListLd(
+  lang: Locale,
+  products: readonly Product[],
+  dict: Dictionary,
+) {
+  const url = absoluteUrl(`/${lang}/shop`);
+  return {
+    "@context": "https://schema.org",
+    "@type": "ItemList",
+    name: dict.shop.eyebrow,
+    url,
+    numberOfItems: products.length,
+    itemListElement: products.map((p, idx) => ({
+      "@type": "ListItem",
+      position: idx + 1,
+      item: {
+        "@type": "Product",
+        "@id": `${SITE_URL}/#product-${p.id}`,
+        name: p.title,
+        sku: p.id,
+        brand: { "@type": "Brand", name: p.brand },
+        category: p.category,
+        description: p.description,
+        image: p.images?.map((i) => i.url) ?? [absoluteUrl("/logo.png")],
+        offers: {
+          "@type": "Offer",
+          priceCurrency: "MAD",
+          price: p.price,
+          availability: p.isSoldOut
+            ? "https://schema.org/SoldOut"
+            : "https://schema.org/InStock",
+          itemCondition: conditionToSchema(p.condition),
+          url,
+        },
+      },
+    })),
+  };
+}
+
+function conditionToSchema(c: Product["condition"]): string {
+  // schema.org only has 4 buckets — we map our friendly grades onto the
+  // closest official enum value so search engines can render them.
+  switch (c) {
+    case "Like new":
+      return "https://schema.org/NewCondition";
+    case "Excellent":
+    case "Very good":
+      return "https://schema.org/UsedCondition";
+    case "Good":
+    default:
+      return "https://schema.org/UsedCondition";
+  }
 }
 
 /* ────────────────────────────────────────────────────────────────────────── */
