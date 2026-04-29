@@ -7,7 +7,7 @@
  * MVP and lets every page render on the server with zero round-trips.
  */
 
-export const AUDIENCES = ["women", "men", "kids"] as const;
+export const AUDIENCES = ["men", "kids"] as const;
 export type Audience = (typeof AUDIENCES)[number];
 
 export const CATEGORIES = [
@@ -21,7 +21,6 @@ export type Category = (typeof CATEGORIES)[number];
 
 /** Sizes are intentionally small per audience — fewer choices = less anxiety. */
 export const SIZES_BY_AUDIENCE: Record<Audience, readonly string[]> = {
-  women: ["XS", "S", "M", "L", "XL"],
   men: ["S", "M", "L", "XL", "XXL"],
   kids: ["2-4y", "4-6y", "6-8y", "8-10y", "10-12y"],
 };
@@ -50,68 +49,6 @@ export interface Product {
 const P = (p: Product): Product => p;
 
 export const PRODUCTS: readonly Product[] = [
-  // ── Women ────────────────────────────────────────────────────────────────
-  P({
-    id: "w-jkt-levi-trucker",
-    title: "Trucker Denim Jacket",
-    brand: "Levi's",
-    audience: "women",
-    category: "jackets",
-    sizes: ["S", "M", "L"],
-    price: 38,
-    originalPrice: 110,
-    condition: "Excellent",
-    accent: { emoji: "🧥", bg: "#dde7ff" },
-  }),
-  P({
-    id: "w-shr-zara-blouse",
-    title: "Linen Button-up Blouse",
-    brand: "Zara",
-    audience: "women",
-    category: "shirts",
-    sizes: ["XS", "S", "M"],
-    price: 16,
-    originalPrice: 49,
-    condition: "Like new",
-    accent: { emoji: "👚", bg: "#fde6ee" },
-  }),
-  P({
-    id: "w-pnt-cos-trousers",
-    title: "Wide-leg Wool Trousers",
-    brand: "COS",
-    audience: "women",
-    category: "pants",
-    sizes: ["S", "M", "L", "XL"],
-    price: 29,
-    originalPrice: 95,
-    condition: "Very good",
-    accent: { emoji: "👖", bg: "#e8e3ff" },
-  }),
-  P({
-    id: "w-shoe-nike-airmax",
-    title: "Air Max 90 Sneakers",
-    brand: "Nike",
-    audience: "women",
-    category: "shoes",
-    sizes: ["S", "M", "L"],
-    price: 54,
-    originalPrice: 130,
-    condition: "Excellent",
-    accent: { emoji: "👟", bg: "#fff1d6" },
-  }),
-  P({
-    id: "w-acc-coach-bag",
-    title: "Mini Tabby Shoulder Bag",
-    brand: "Coach",
-    audience: "women",
-    category: "accessories",
-    sizes: [ACCESSORIES_SIZE],
-    price: 89,
-    originalPrice: 295,
-    condition: "Like new",
-    accent: { emoji: "👜", bg: "#ffe1d4" },
-  }),
-
   // ── Men ──────────────────────────────────────────────────────────────────
   P({
     id: "m-jkt-northface-puffer",
@@ -262,7 +199,6 @@ export function filterProducts(
 
 /** Pretty labels for UI. Keep separate from the data so URLs stay lowercase. */
 export const AUDIENCE_LABEL: Record<Audience, string> = {
-  women: "Women",
   men: "Men",
   kids: "Kids",
 };
@@ -284,7 +220,6 @@ export const CATEGORY_EMOJI: Record<Category, string> = {
 };
 
 export const AUDIENCE_EMOJI: Record<Audience, string> = {
-  women: "👩",
   men: "👨",
   kids: "🧒",
 };

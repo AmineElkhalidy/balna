@@ -83,7 +83,7 @@ export function Quiz({ lang, dict }: QuizProps) {
             title={dict.quiz.step1.title}
             subtitle={dict.quiz.step1.subtitle}
           >
-            <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
+            <div className="grid grid-cols-2 gap-4">
               {AUDIENCES.map((a) => (
                 <BigCard
                   key={a}
