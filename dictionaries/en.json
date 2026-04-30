@@ -10,7 +10,13 @@
     "subtitle": "No menus. No filters to fiddle with. Tell us who, what, the brand and the size — we'll show only items that match."
   },
   "footer": {
-    "tagline": "Pre-loved branded thrift · Free message-to-buy on WhatsApp"
+    "tagline": "Pre-loved branded thrift · Free message-to-buy on WhatsApp",
+    "developedBy": "Developed by"
+  },
+  "socials": {
+    "instagram": "Follow Balna on Instagram",
+    "facebook": "Follow Balna on Facebook",
+    "whatsapp": "Message Balna on WhatsApp"
   },
   "quiz": {
     "ariaLabel": "Find your fit in 4 steps",

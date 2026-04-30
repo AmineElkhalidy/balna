@@ -1,6 +1,7 @@
 import { Suspense } from "react";
 import Link from "next/link";
 import { LangSwitcher } from "./LangSwitcher";
+import { SocialLinks } from "./SocialLinks";
 import type { Dictionary } from "@/lib/i18n";
 import type { Locale } from "@/lib/i18n-config";
 
@@ -23,6 +24,7 @@ export function Header({ lang, dict, action }: HeaderProps) {
           <Wordmark />
         </Link>
         <div className="flex items-center gap-2 text-sm">
+          <SocialLinks dict={dict} variant="header" />
           <Suspense
             fallback={
               <span

@@ -1,6 +1,7 @@
 import { notFound } from "next/navigation";
 import { Header } from "../components/Header";
 import { Quiz } from "../components/Quiz";
+import { SocialLinks } from "../components/SocialLinks";
 import { getDictionary, hasLocale, type Dictionary } from "@/lib/i18n";
 import { getBrandIndex, getSiteSettings } from "@/lib/sanity/products";
 import { SITE_NAME, SITE_URL, absoluteUrl, jsonLdString } from "@/lib/seo";
@@ -106,8 +107,20 @@ function Hero({ dict }: { dict: Dictionary }) {
 function FooterNote({ dict }: { dict: Dictionary }) {
   return (
     <footer className="mt-auto border-t border-balna-line bg-balna-paper">
-      <div className="mx-auto w-full max-w-5xl px-5 py-6 text-center text-sm text-balna-muted sm:px-6">
-        {dict.footer.tagline}
+      <div className="mx-auto flex w-full max-w-5xl flex-col items-center gap-3 px-5 py-6 text-center text-sm text-balna-muted sm:px-6">
+        <SocialLinks dict={dict} variant="footer" />
+        <p>{dict.footer.tagline}</p>
+        <p className="text-xs">
+          {dict.footer.developedBy}{" "}
+          <a
+            href="https://amineelkhalidy.dev"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="font-semibold text-balna-ink underline-offset-2 hover:text-balna-teal-dark hover:underline"
+          >
+            Amine Elkhalidy
+          </a>
+        </p>
       </div>
     </footer>
   );
