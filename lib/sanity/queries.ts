@@ -56,6 +56,11 @@ export const brandIndexQuery = defineQuery(/* groq */ `
  *
  * Strings come straight from the URL search params and are escaped by the
  * GROQ runtime, so this is safe to call with untrusted input.
+ *
+ * Ordering: "Like new" pieces float to the top so the first row a shopper
+ * sees is the best of the catalog, then newest-first within each bucket.
+ * Because we don't constrain by category here, an unfiltered audience-only
+ * query naturally returns a *mix* of categories at the top.
  */
 export const productsQuery = defineQuery(/* groq */ `
   *[
@@ -65,7 +70,7 @@ export const productsQuery = defineQuery(/* groq */ `
     && (count($categories) == 0 || category in $categories)
     && (count($brands) == 0 || brand->name in $brands)
     && (count($sizes) == 0 || count(sizes[@ in $sizes]) > 0)
-  ] | order(_createdAt desc) ${PRODUCT_PROJECTION}
+  ] | order(select(condition == "Like new" => 0, 1) asc, _createdAt desc) ${PRODUCT_PROJECTION}
 `);
 
 /**

@@ -147,13 +147,22 @@ function localFilter(filter: QuizFilter): Product[] {
   const wantedBrands =
     filter.brands && filter.brands.length > 0 ? new Set(filter.brands) : null;
 
-  return LOCAL_PRODUCTS.filter((p) => {
+  const matched = LOCAL_PRODUCTS.filter((p) => {
     if (filter.audience && p.audience !== filter.audience) return false;
     if (filter.category && p.category !== filter.category) return false;
     if (wantedBrands && !wantedBrands.has(p.brand)) return false;
     if (wantedSizes && !p.sizes.some((s) => wantedSizes.includes(s)))
       return false;
     return true;
+  });
+
+  // Mirror the Sanity ordering: "Like new" first, then preserve the source
+  // order within each bucket (Array.prototype.sort is stable in ES2019+,
+  // which Next 16's compile target satisfies).
+  return [...matched].sort((a, b) => {
+    const aBest = a.condition === "Like new" ? 0 : 1;
+    const bBest = b.condition === "Like new" ? 0 : 1;
+    return aBest - bBest;
   });
 }
 

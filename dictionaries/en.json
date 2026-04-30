@@ -16,6 +16,7 @@
     "ariaLabel": "Find your fit in 4 steps",
     "stepLabel": "Step {step} of {total}",
     "back": "← Back",
+    "skipToAll": "Show me everything →",
     "audience": {
       "title": "Who are you shopping for?",
       "subtitle": "Pick one. We'll only show items that fit."

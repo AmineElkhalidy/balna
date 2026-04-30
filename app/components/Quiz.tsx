@@ -97,6 +97,19 @@ export function Quiz({ lang, dict, brandIndex }: QuizProps) {
     router.push(`/${lang}/shop?${params.toString()}`);
   }
 
+  /**
+   * Escape hatch — once an audience is picked, the user can bail out of the
+   * funnel at any later step and see every in-stock piece for that audience.
+   * The shop page sorts "Like new" first, so the landing view is a curated
+   * mix of all categories with the best-quality items up top.
+   */
+  function skipToAll() {
+    if (!audience) return;
+    const params = new URLSearchParams();
+    params.set("for", audience);
+    router.push(`/${lang}/shop?${params.toString()}`);
+  }
+
   return (
     <section
       className="relative flex flex-1 flex-col"
@@ -134,6 +147,8 @@ export function Quiz({ lang, dict, brandIndex }: QuizProps) {
             subtitle={dict.quiz.category.subtitle}
             backLabel={dict.quiz.back}
             onBack={() => setStep(1)}
+            skipToAllLabel={dict.quiz.skipToAll}
+            onSkipToAll={skipToAll}
           >
             <div className="grid grid-cols-2 gap-4 sm:grid-cols-3">
               {CATEGORIES.map((c) => (
@@ -157,6 +172,8 @@ export function Quiz({ lang, dict, brandIndex }: QuizProps) {
             subtitle={dict.quiz.brand.subtitle}
             backLabel={dict.quiz.back}
             onBack={() => setStep(2)}
+            skipToAllLabel={dict.quiz.skipToAll}
+            onSkipToAll={skipToAll}
           >
             {brandOptions.length === 0 ? (
               <BrandEmpty
@@ -223,6 +240,8 @@ export function Quiz({ lang, dict, brandIndex }: QuizProps) {
             }
             backLabel={dict.quiz.back}
             onBack={() => setStep(3)}
+            skipToAllLabel={dict.quiz.skipToAll}
+            onSkipToAll={skipToAll}
           >
             <div className="flex flex-wrap gap-3">
               {sizeOptions.map((s) => {
@@ -297,6 +316,8 @@ function StepShell({
   subtitle,
   backLabel,
   onBack,
+  skipToAllLabel,
+  onSkipToAll,
   children,
 }: {
   eyebrow: string;
@@ -304,23 +325,36 @@ function StepShell({
   subtitle?: string;
   backLabel?: string;
   onBack?: () => void;
+  skipToAllLabel?: string;
+  onSkipToAll?: () => void;
   children: React.ReactNode;
 }) {
   return (
     <div className="step-enter flex flex-1 flex-col">
-      <div className="flex items-center justify-between">
+      <div className="flex items-center justify-between gap-3">
         <p className="text-xs font-semibold uppercase tracking-[0.18em] text-balna-teal-dark">
           {eyebrow}
         </p>
-        {onBack && backLabel ? (
-          <button
-            type="button"
-            onClick={onBack}
-            className="rounded-full px-3 py-1.5 text-sm font-medium text-balna-muted hover:bg-balna-line/60 hover:text-balna-ink"
-          >
-            {backLabel}
-          </button>
-        ) : null}
+        <div className="flex items-center gap-2">
+          {onSkipToAll && skipToAllLabel ? (
+            <button
+              type="button"
+              onClick={onSkipToAll}
+              className="rounded-full bg-balna-teal/10 px-3 py-1.5 text-sm font-semibold text-balna-teal-dark transition hover:bg-balna-teal/20"
+            >
+              {skipToAllLabel}
+            </button>
+          ) : null}
+          {onBack && backLabel ? (
+            <button
+              type="button"
+              onClick={onBack}
+              className="rounded-full px-3 py-1.5 text-sm font-medium text-balna-muted hover:bg-balna-line/60 hover:text-balna-ink"
+            >
+              {backLabel}
+            </button>
+          ) : null}
+        </div>
       </div>
       <h1 className="mt-4 font-balna-display text-3xl font-extrabold tracking-tight text-balna-ink sm:text-4xl">
         {title}
