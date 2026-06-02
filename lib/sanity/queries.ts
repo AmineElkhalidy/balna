@@ -13,7 +13,6 @@ const PRODUCT_PROJECTION = /* groq */ `{
   audience,
   category,
   sizes,
-  condition,
   isSoldOut,
   description,
   "brand": brand->{
@@ -51,16 +50,15 @@ export const brandIndexQuery = defineQuery(/* groq */ `
 `);
 
 /**
- * Filtered, sorted product list for /shop. All filter params are optional —
- * an empty array is treated as "no constraint" thanks to `count(...) == 0`.
+ * Filtered, sorted product list for the catalog. All filter params are
+ * optional — an empty array is treated as "no constraint" thanks to
+ * `count(...) == 0`.
  *
  * Strings come straight from the URL search params and are escaped by the
  * GROQ runtime, so this is safe to call with untrusted input.
  *
- * Ordering: "Like new" pieces float to the top so the first row a shopper
- * sees is the best of the catalog, then newest-first within each bucket.
- * Because we don't constrain by category here, an unfiltered audience-only
- * query naturally returns a *mix* of categories at the top.
+ * Sort: `$sort` is one of `"newest" | "priceAsc" | "priceDesc"`. Anything
+ * else falls through to the newest-first default.
  */
 export const productsQuery = defineQuery(/* groq */ `
   *[
@@ -70,7 +68,18 @@ export const productsQuery = defineQuery(/* groq */ `
     && (count($categories) == 0 || category in $categories)
     && (count($brands) == 0 || brand->name in $brands)
     && (count($sizes) == 0 || count(sizes[@ in $sizes]) > 0)
-  ] | order(select(condition == "Like new" => 0, 1) asc, _createdAt desc) ${PRODUCT_PROJECTION}
+  ] | order(
+    select(
+      $sort == "priceAsc" => price,
+      $sort == "priceDesc" => 0,
+      0
+    ) asc,
+    select(
+      $sort == "priceDesc" => price,
+      0
+    ) desc,
+    _createdAt desc
+  ) ${PRODUCT_PROJECTION}
 `);
 
 /**

@@ -4,10 +4,10 @@
  * Next.js 16 renamed Middleware to "Proxy" — same shape, new file name.
  * This routes every visitor to a localised version of the page they asked for:
  *
- *   /              →  /en   (or /ar if their browser prefers Arabic)
- *   /shop?for=...  →  /en/shop?for=...
- *   /en/shop       →  pass-through
- *   /ar/shop       →  pass-through
+ *   /              →  /en      (or /ar if their browser prefers Arabic)
+ *   /quiz          →  /en/quiz (likewise)
+ *   /en/...        →  pass-through
+ *   /ar/...        →  pass-through
  */
 import { NextResponse, type NextRequest } from "next/server";
 
@@ -15,7 +15,7 @@ const LOCALES = ["en", "ar"] as const;
 const DEFAULT_LOCALE = "en";
 
 function pickLocale(req: NextRequest): (typeof LOCALES)[number] {
-  const cookie = req.cookies.get("balna_locale")?.value;
+  const cookie = req.cookies.get("minor_locale")?.value;
   if (cookie && (LOCALES as readonly string[]).includes(cookie)) {
     return cookie as (typeof LOCALES)[number];
   }

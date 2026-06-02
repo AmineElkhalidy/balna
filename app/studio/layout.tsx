@@ -5,7 +5,7 @@
  * styles can't leak into the Sanity UI.
  */
 export const metadata = {
-  title: "Balna Studio",
+  title: "Minor Shop Studio",
   robots: { index: false, follow: false },
 };
 

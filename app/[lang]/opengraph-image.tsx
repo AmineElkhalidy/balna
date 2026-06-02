@@ -3,7 +3,7 @@ import { notFound } from "next/navigation";
 import { getDictionary, hasLocale } from "@/lib/i18n";
 import { LOCALE_META, type Locale } from "@/lib/i18n-config";
 
-export const alt = "Balna — Pre-loved branded thrift, made simple";
+export const alt = "Minor Shop — quality clothing from Morocco, Turkey and China";
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
 
@@ -58,13 +58,12 @@ export default async function OgImage({
   const dict = await getDictionary(lang);
   const meta = LOCALE_META[lang];
 
-  const heading = dict.hero.title;
-  const subline = dict.hero.subtitle;
-  const eyebrow = dict.hero.eyebrow;
+  const heading = dict.home.tagline;
+  const subline = dict.footer.tagline;
 
   // Subset the binary to just the glyphs that appear on the card to keep the
-  // download under ~30KB. Includes Latin "Balna" wordmark + locale text.
-  const subset = "Balna" + heading + subline + eyebrow;
+  // download under ~30KB. Includes Latin "Minor Shop" wordmark + locale text.
+  const subset = "Minor Shop" + heading + subline;
   const family = lang === "ar" ? "Cairo" : "Plus+Jakarta+Sans";
 
   const [bold, extraBold] = await Promise.all([
@@ -87,36 +86,21 @@ export default async function OgImage({
           background:
             "linear-gradient(135deg, #fbf9f5 0%, #f3f7f6 60%, #e9f8f4 100%)",
           padding: "72px 88px",
-          fontFamily: "BalnaDisplay",
+          fontFamily: "MinorDisplay",
           color: "#0d1126",
           direction: isRtl ? "rtl" : "ltr",
         }}
       >
-        {/* Top row: wordmark + eyebrow chip */}
+        {/* Top row: wordmark only — the value prop carries the eyebrow role
+            in the heading slot below, no extra chip needed. */}
         <div
           style={{
             display: "flex",
             alignItems: "center",
-            justifyContent: "space-between",
             width: "100%",
           }}
         >
           <Wordmark />
-          <span
-            style={{
-              fontSize: 22,
-              fontWeight: 700,
-              color: "#0c9281",
-              background: "#ffffff",
-              padding: "10px 22px",
-              borderRadius: 999,
-              letterSpacing: "0.05em",
-              textTransform: "uppercase",
-              boxShadow: "0 2px 4px rgba(13,17,38,0.04)",
-            }}
-          >
-            {eyebrow}
-          </span>
         </div>
 
         {/* Middle: hero copy */}
@@ -202,8 +186,8 @@ export default async function OgImage({
     {
       ...size,
       fonts: [
-        { name: "BalnaDisplay", data: bold, style: "normal", weight: 700 },
-        { name: "BalnaDisplay", data: extraBold, style: "normal", weight: 800 },
+        { name: "MinorDisplay", data: bold, style: "normal", weight: 700 },
+        { name: "MinorDisplay", data: extraBold, style: "normal", weight: 800 },
       ],
     },
   );
@@ -217,16 +201,16 @@ function Wordmark() {
       style={{
         display: "flex",
         alignItems: "center",
-        fontFamily: "BalnaDisplay",
+        fontFamily: "MinorDisplay",
         fontWeight: 800,
         fontSize: 64,
         letterSpacing: "-0.02em",
-        // Force LTR — the brand always reads "Balna", even on RTL OG cards.
+        // Force LTR — the brand always reads "Minor Shop", even on RTL OG cards.
         direction: "ltr",
       }}
     >
-      <span style={{ color: "#11b79f" }}>Bal</span>
-      <span style={{ color: "#1a2a52" }}>na</span>
+      <span style={{ color: "#11b79f" }}>Minor</span>
+      <span style={{ color: "#1a2a52" }}>&nbsp;Shop</span>
     </div>
   );
 }

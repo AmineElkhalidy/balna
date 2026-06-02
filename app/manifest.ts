@@ -2,17 +2,17 @@ import type { MetadataRoute } from "next";
 import { SITE_NAME } from "@/lib/seo";
 
 /**
- * Web app manifest — turns Balna into an installable PWA shell on Android
- * and gives iOS Safari the right colour/title hints when added to the home
- * screen. The `start_url` doesn't include a locale so the proxy can pick the
- * right one based on `Accept-Language`.
+ * Web app manifest — turns Minor Shop into an installable PWA shell on
+ * Android and gives iOS Safari the right colour/title hints when added to
+ * the home screen. The `start_url` doesn't include a locale so the proxy can
+ * pick the right one based on `Accept-Language`.
  */
 export default function manifest(): MetadataRoute.Manifest {
   return {
-    name: `${SITE_NAME} — Pre-loved branded thrift`,
+    name: `${SITE_NAME} — Quality clothing from Morocco, Turkey & China`,
     short_name: SITE_NAME,
     description:
-      "Pre-owned branded clothing made simple. Answer 4 questions and shop only what fits.",
+      "Quality clothing sourced from Morocco, Turkey and China. Answer 4 questions and we'll show you only what fits.",
     start_url: "/",
     scope: "/",
     display: "standalone",

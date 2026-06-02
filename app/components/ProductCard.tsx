@@ -73,9 +73,11 @@ export function ProductCard({ product, lang, dict, settings }: ProductCardProps)
               {format(dict.product.savings, { percent: savings })}
             </span>
           )}
-          <span className="absolute end-3 top-3 rounded-full bg-white/95 px-2.5 py-1 text-[11px] font-semibold text-balna-ink">
-            {dict.condition[product.condition]}
-          </span>
+          {!isSoldOut && (
+            <span className="absolute end-3 top-3 rounded-full bg-white/95 px-2.5 py-1 text-[11px] font-semibold uppercase tracking-wider text-balna-teal-dark">
+              {dict.product.new}
+            </span>
+          )}
         </div>
 
         <div className="flex flex-1 flex-col gap-3 p-4">

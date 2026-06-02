@@ -2,7 +2,7 @@ import { SOCIAL_LINKS, SOCIAL_ORDER, type SocialKey } from "@/lib/socials";
 import type { Dictionary } from "@/lib/i18n";
 
 /**
- * Icon row linking out to Balna's public social profiles.
+ * Icon row linking out to Minor Shop's public social profiles.
  *
  * Two visual variants:
  *   • `header` — small monochrome icons, hidden on narrow viewports so the

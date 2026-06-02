@@ -1,11 +1,15 @@
 @import "tailwindcss";
 
 /*
-  Balna brand palette
-  - Teal:    matches the "Bal" in the logo
-  - Navy:    matches the "na" in the logo
+  Minor Shop brand palette
+  - Teal:    used for "Minor" in the wordmark + accents
+  - Navy:    used for "Shop" in the wordmark + dark CTAs
   - Cream:   warm off-white surface for product cards
   - Whatsapp green for the primary CTA on product cards
+
+  The semantic tokens still carry the legacy `balna-*` prefix internally so
+  every component can share them without churn — when we want to rename them
+  we can do it in one swoop with a search-and-replace.
 */
 @theme {
   --color-balna-teal: #11b79f;
@@ -73,7 +77,7 @@ html[dir="rtl"] .font-balna-display {
 /* Smooth step-to-step transition for the onboarding quiz. The Quiz remounts
    each StepShell with `key={step}`, so this animation runs every time the
    user advances or goes back. */
-@keyframes balna-step-in {
+@keyframes minor-step-in {
   from {
     opacity: 0;
     transform: translateY(12px);
@@ -85,7 +89,7 @@ html[dir="rtl"] .font-balna-display {
 }
 
 .step-enter {
-  animation: balna-step-in 320ms cubic-bezier(0.2, 0.8, 0.2, 1) both;
+  animation: minor-step-in 320ms cubic-bezier(0.2, 0.8, 0.2, 1) both;
 }
 
 @media (prefers-reduced-motion: reduce) {

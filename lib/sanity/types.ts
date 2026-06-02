@@ -1,4 +1,4 @@
-import type { Audience, Category, Condition } from "@/lib/catalog";
+import type { Audience, Category } from "@/lib/catalog";
 
 /**
  * TypeScript shapes mirroring the GROQ projections in `./queries.ts`.
@@ -34,7 +34,6 @@ export interface SanityProduct {
   audience: Audience;
   category: Category;
   sizes: string[];
-  condition: Condition;
   isSoldOut: boolean;
   description: string | null;
   brand: SanityBrand;

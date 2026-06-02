@@ -63,6 +63,7 @@ export async function getProducts(filter: QuizFilter): Promise<Product[]> {
     categories: filter.category ? [filter.category] : [],
     brands: filter.brands && filter.brands.length > 0 ? [...filter.brands] : [],
     sizes: filter.sizes && filter.sizes.length > 0 ? [...filter.sizes] : [],
+    sort: filter.sort ?? "newest",
   };
   const docs = await getSanityClient().fetch<SanityProduct[]>(
     productsQuery,
@@ -156,14 +157,18 @@ function localFilter(filter: QuizFilter): Product[] {
     return true;
   });
 
-  // Mirror the Sanity ordering: "Like new" first, then preserve the source
-  // order within each bucket (Array.prototype.sort is stable in ES2019+,
-  // which Next 16's compile target satisfies).
-  return [...matched].sort((a, b) => {
-    const aBest = a.condition === "Like new" ? 0 : 1;
-    const bBest = b.condition === "Like new" ? 0 : 1;
-    return aBest - bBest;
-  });
+  // Mirror the sort behaviour of the GROQ query so dev (no Sanity env vars)
+  // and prod (Sanity-backed) feel identical when toggling the sort dropdown.
+  switch (filter.sort) {
+    case "priceAsc":
+      return [...matched].sort((a, b) => a.price - b.price);
+    case "priceDesc":
+      return [...matched].sort((a, b) => b.price - a.price);
+    case "newest":
+    default:
+      // Local fixtures are already in insertion order; no _createdAt to use.
+      return matched;
+  }
 }
 
 function toProduct(doc: SanityProduct): Product {
@@ -177,7 +182,6 @@ function toProduct(doc: SanityProduct): Product {
     sizes: doc.sizes,
     price: doc.price,
     originalPrice: doc.originalPrice ?? undefined,
-    condition: doc.condition,
     accent: {
       emoji: emojiForCategory(doc.category),
       bg: doc.brand.accentBg ?? accentSeed?.bg ?? "#e9f8f4",

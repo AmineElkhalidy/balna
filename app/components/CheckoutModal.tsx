@@ -21,10 +21,10 @@ interface CheckoutModalProps {
 /**
  * Manual checkout modal.
  *
- * No cart, no payment gateway — Balna deals in 1-of-1 thrift, so the buyer
- * either WhatsApps Balna directly (default) or reserves the piece by bank
- * transfer. The modal exposes both flows in a single sheet on mobile and a
- * centered card on desktop.
+ * No cart, no payment gateway — the buyer either WhatsApps Minor Shop
+ * directly (default) or reserves the piece by bank transfer. The modal
+ * exposes both flows in a single sheet on mobile and a centered card on
+ * desktop.
  *
  * Implementation: a controlled HTML <dialog>. We open it imperatively in an
  * effect so that ESC-to-close and the native focus trap work, and we close on
@@ -98,8 +98,7 @@ export function CheckoutModal({
               {product.title}
             </h2>
             <p className="mt-1 text-sm text-balna-muted" dir="ltr">
-              ${product.price} · {dict.condition[product.condition]} ·{" "}
-              {product.sizes.join(" / ")}
+              ${product.price} · {product.sizes.join(" / ")}
             </p>
           </div>
           <button

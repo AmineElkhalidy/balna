@@ -47,7 +47,7 @@ export const siteSettings = defineType({
           name: "instructions",
           title: "Reference instructions",
           description:
-            "Tell buyers what to put in the transfer reference — usually the product ID. e.g. 'Use this reference: BAL-####'.",
+            "Tell buyers what to put in the transfer reference — usually the product ID. e.g. 'Use this reference: MS-####'.",
           type: "text",
           rows: 3,
         }),

@@ -15,20 +15,12 @@ const CATEGORY_OPTIONS = [
   { title: "Accessories", value: "accessories" },
 ];
 
-const CONDITION_OPTIONS = [
-  { title: "Like new", value: "Like new" },
-  { title: "Excellent", value: "Excellent" },
-  { title: "Very good", value: "Very good" },
-  { title: "Good", value: "Good" },
-];
-
 /**
  * Product
  *
- * Each product is a one-of-one thrift item. `isSoldOut` is the operational
- * flag — Balna doesn't track inventory counts because every product is unique.
- * When a piece sells the editor flips the toggle and it disappears from the
- * storefront on the next ISR revalidation.
+ * `isSoldOut` is the operational flag — Minor Shop doesn't track per-size
+ * inventory counts. When a piece is gone the editor flips the toggle and it
+ * disappears from the storefront on the next ISR revalidation.
  */
 export const product = defineType({
   name: "product",
@@ -93,13 +85,6 @@ export const product = defineType({
       description: "Optional. Shown as a strike-through when higher than price.",
       type: "number",
       validation: (R) => R.min(0).integer(),
-    }),
-    defineField({
-      name: "condition",
-      title: "Condition",
-      type: "string",
-      options: { list: CONDITION_OPTIONS },
-      validation: (R) => R.required(),
     }),
     defineField({
       name: "images",

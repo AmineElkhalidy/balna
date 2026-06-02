@@ -13,7 +13,7 @@ interface LangSwitcherProps {
 /**
  * Compact pill that swaps the route's first segment between locales while
  * preserving the rest of the path AND any active query string (so the user
- * keeps their quiz answers when they flip languages on /shop).
+ * keeps their filter selection when they flip languages mid-browse).
  */
 export function LangSwitcher({ currentLang, switchLabel }: LangSwitcherProps) {
   const pathname = usePathname() ?? `/${currentLang}`;
@@ -22,7 +22,7 @@ export function LangSwitcher({ currentLang, switchLabel }: LangSwitcherProps) {
   const next = LOCALES.find((l) => l !== currentLang) ?? currentLang;
   const meta = LOCALE_META[next];
 
-  // Replace just the leading locale segment so /en/shop ↔ /ar/shop.
+  // Replace just the leading locale segment so /en/... ↔ /ar/... .
   const segments = pathname.split("/").filter(Boolean);
   if (segments[0] && (LOCALES as readonly string[]).includes(segments[0])) {
     segments[0] = next;

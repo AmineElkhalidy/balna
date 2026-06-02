@@ -3,12 +3,12 @@ import type { Dictionary } from "./i18n";
 
 /**
  * Default WhatsApp number used when neither Sanity nor an env var has supplied
- * one. Production should always set `NEXT_PUBLIC_BALNA_WHATSAPP` or fill in
+ * one. Production should always set `NEXT_PUBLIC_MINOR_WHATSAPP` or fill in
  * the field on the Site settings document — this stub exists only so dev
  * builds without a Sanity project still produce a valid `wa.me` link.
  */
 export const WHATSAPP_NUMBER =
-  process.env.NEXT_PUBLIC_BALNA_WHATSAPP?.replace(/\D/g, "") || "15555550123";
+  process.env.NEXT_PUBLIC_MINOR_WHATSAPP?.replace(/\D/g, "") || "15555550123";
 
 /**
  * Build a `wa.me` deep link with a pre-filled message in the user's language.

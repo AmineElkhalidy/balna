@@ -94,20 +94,20 @@ export function Quiz({ lang, dict, brandIndex }: QuizProps) {
     params.set("type", category);
     if (brands.length > 0) params.set("brand", brands.join(","));
     if (sizes.length > 0) params.set("size", sizes.join(","));
-    router.push(`/${lang}/shop?${params.toString()}`);
+    router.push(`/${lang}?${params.toString()}`);
   }
 
   /**
    * Escape hatch — once an audience is picked, the user can bail out of the
    * funnel at any later step and see every in-stock piece for that audience.
-   * The shop page sorts "Like new" first, so the landing view is a curated
-   * mix of all categories with the best-quality items up top.
+   * Lands on the catalog with just the audience filter applied, where the
+   * sticky filter bar takes over for further refinement.
    */
   function skipToAll() {
     if (!audience) return;
     const params = new URLSearchParams();
     params.set("for", audience);
-    router.push(`/${lang}/shop?${params.toString()}`);
+    router.push(`/${lang}?${params.toString()}`);
   }
 
   return (

@@ -5,10 +5,10 @@ import { LOCALES, LOCALE_META, type Locale } from "./i18n-config";
  * builds in CI without `.env` still produce sensible absolute links.
  */
 export const SITE_URL = (
-  process.env.NEXT_PUBLIC_SITE_URL || "https://balna.vercel.app"
+  process.env.NEXT_PUBLIC_SITE_URL || "https://minor-shop.vercel.app"
 ).replace(/\/+$/, "");
 
-export const SITE_NAME = "Balna";
+export const SITE_NAME = "Minor Shop";
 
 /** Build an absolute URL from a path. Pass it any locale-aware path. */
 export function absoluteUrl(path: string): string {
@@ -41,11 +41,12 @@ export function jsonLdString(payload: object): string {
 
 /** Strict allow-list — lets non-Latin search query input pass to keywords too. */
 export const BASE_KEYWORDS = [
-  "thrift",
-  "second-hand",
-  "preloved",
-  "branded clothing",
+  "clothing store",
+  "Moroccan clothing",
+  "Turkish clothing",
+  "Chinese clothing",
+  "imported fashion",
   "Morocco",
   "WhatsApp shop",
-  "balna",
+  "Minor Shop",
 ];

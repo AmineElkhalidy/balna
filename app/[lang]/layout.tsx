@@ -31,31 +31,31 @@ const arabic = Cairo({
 
 const titles: Record<string, { title: string; description: string }> = {
   en: {
-    title: "Balna — Pre-loved branded thrift, made simple",
+    title: "Minor Shop — Quality clothing from Morocco, Turkey & China",
     description:
-      "Shop pre-owned branded clothing from Balna. Answer 4 quick questions and we show you only what fits — buy via WhatsApp or bank transfer.",
+      "Shop quality clothing at Minor Shop. Sourced from Morocco, Turkey and China — answer 4 quick questions and we show you only what fits. Buy via WhatsApp or bank transfer.",
   },
   ar: {
-    title: "Balna — حوايج ماركات مستعملة، بسيطة وسهلة",
+    title: "Minor Shop — حوايج كواليتي من المغرب وتركيا والصين",
     description:
-      "تسوق حوايج ماركات مستعملة من Balna. جاوب على 4 أسئلة وغانوريوك غير اللي يناسبك — شراء عبر واتساب ولا تحويل بنكي.",
+      "تسوق حوايج كواليتي من Minor Shop. من المغرب وتركيا والصين — جاوب على 4 أسئلة وغانوريوك غير اللي يناسبك. شراء عبر واتساب ولا تحويل بنكي.",
   },
 };
 
 const localeKeywords: Record<string, string[]> = {
   en: [
-    "thrift store",
-    "pre-loved fashion",
-    "branded thrift",
-    "vintage clothing Morocco",
+    "clothing store Morocco",
+    "Turkish fashion",
+    "Chinese fashion",
+    "imported clothes",
     "WhatsApp shop",
   ],
   ar: [
-    "حوايج مستعملة",
-    "ماركات مستعملة",
-    "ثوب مستعمل",
+    "حوايج كواليتي",
+    "حوايج تركيا",
+    "حوايج الصين",
     "تسوق على واتساب",
-    "Balna",
+    "Minor Shop",
   ],
 };
 
@@ -77,7 +77,7 @@ export async function generateMetadata({
     title: {
       default: meta.title,
       // Inner pages opt into the brand-suffixed pattern via `title: "Foo"`
-      // and end up rendering as "Foo · Balna".
+      // and end up rendering as "Foo · Minor Shop".
       template: `%s · ${SITE_NAME}`,
     },
     description: meta.description,

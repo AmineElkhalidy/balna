@@ -1,5 +1,5 @@
 /**
- * Balna catalog — single source of truth for the demo.
+ * Minor Shop catalog — single source of truth for the demo.
  *
  * In production this module would be replaced by a database query (e.g. a
  * `getProducts` server function backed by Postgres / Sanity / Shopify).
@@ -27,8 +27,6 @@ export const SIZES_BY_AUDIENCE: Record<Audience, readonly string[]> = {
 
 export const ACCESSORIES_SIZE = "One Size";
 
-export type Condition = "Like new" | "Excellent" | "Very good" | "Good";
-
 export interface ProductImage {
   /** Pre-built CDN URL. Pass through `next/image` `unoptimized` if you don't want re-encoding. */
   url: string;
@@ -51,14 +49,13 @@ export interface Product {
   price: number;
   /** Original retail, used to show the savings badge. */
   originalPrice?: number;
-  condition: Condition;
   /** Color emoji + soft background tone for the placeholder thumbnail. */
   accent: { emoji: string; bg: string };
   /** Real photos from Sanity. When empty/undefined, the emoji placeholder is shown. */
   images?: readonly ProductImage[];
   /** Marked sold by an editor. Filtered out at the data layer, but useful for previews. */
   isSoldOut?: boolean;
-  /** Optional copy from the editor — defects, fit, fabric. */
+  /** Optional copy from the editor — fit, fabric, sourcing notes. */
   description?: string;
 }
 
@@ -75,7 +72,6 @@ export const PRODUCTS: readonly Product[] = [
     sizes: ["M", "L", "XL"],
     price: 95,
     originalPrice: 280,
-    condition: "Very good",
     accent: { emoji: "🧥", bg: "#d8efe8" },
   }),
   P({
@@ -87,7 +83,6 @@ export const PRODUCTS: readonly Product[] = [
     sizes: ["S", "M", "L", "XL"],
     price: 12,
     originalPrice: 39,
-    condition: "Good",
     accent: { emoji: "👔", bg: "#e7eefc" },
   }),
   P({
@@ -99,7 +94,6 @@ export const PRODUCTS: readonly Product[] = [
     sizes: ["M", "L", "XL", "XXL"],
     price: 34,
     originalPrice: 89,
-    condition: "Excellent",
     accent: { emoji: "👖", bg: "#f4ead2" },
   }),
   P({
@@ -111,7 +105,6 @@ export const PRODUCTS: readonly Product[] = [
     sizes: ["M", "L", "XL"],
     price: 62,
     originalPrice: 110,
-    condition: "Like new",
     accent: { emoji: "👟", bg: "#e2f0ff" },
   }),
   P({
@@ -123,7 +116,6 @@ export const PRODUCTS: readonly Product[] = [
     sizes: [ACCESSORIES_SIZE],
     price: 45,
     originalPrice: 165,
-    condition: "Excellent",
     accent: { emoji: "🕶️", bg: "#dee2f1" },
   }),
 
@@ -137,7 +129,6 @@ export const PRODUCTS: readonly Product[] = [
     sizes: ["4-6y", "6-8y", "8-10y"],
     price: 28,
     originalPrice: 79,
-    condition: "Excellent",
     accent: { emoji: "🧥", bg: "#fce6dd" },
   }),
   P({
@@ -149,7 +140,6 @@ export const PRODUCTS: readonly Product[] = [
     sizes: ["2-4y", "4-6y", "6-8y"],
     price: 8,
     originalPrice: 22,
-    condition: "Very good",
     accent: { emoji: "👕", bg: "#e3f4ff" },
   }),
   P({
@@ -161,7 +151,6 @@ export const PRODUCTS: readonly Product[] = [
     sizes: ["6-8y", "8-10y", "10-12y"],
     price: 11,
     originalPrice: 29,
-    condition: "Good",
     accent: { emoji: "👖", bg: "#e6e2f7" },
   }),
   P({
@@ -173,7 +162,6 @@ export const PRODUCTS: readonly Product[] = [
     sizes: ["2-4y", "4-6y", "6-8y", "8-10y"],
     price: 22,
     originalPrice: 55,
-    condition: "Like new",
     accent: { emoji: "👟", bg: "#f1e7df" },
   }),
   P({
@@ -185,10 +173,14 @@ export const PRODUCTS: readonly Product[] = [
     sizes: [ACCESSORIES_SIZE],
     price: 9,
     originalPrice: 24,
-    condition: "Excellent",
     accent: { emoji: "🧢", bg: "#dff1ec" },
   }),
 ];
+
+/** Sort orders surfaced in the catalog UI. Defaults to "newest". */
+export const SORT_KEYS = ["newest", "priceAsc", "priceDesc"] as const;
+export type SortKey = (typeof SORT_KEYS)[number];
+export const DEFAULT_SORT: SortKey = "newest";
 
 export interface QuizFilter {
   audience?: Audience;
@@ -196,6 +188,7 @@ export interface QuizFilter {
   /** Optional list of brand names. Empty / missing means "any brand". */
   brands?: readonly string[];
   sizes?: readonly string[];
+  sort?: SortKey;
 }
 
 /** Returns products matching every provided filter. Missing filters are ignored. */

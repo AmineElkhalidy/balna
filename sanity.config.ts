@@ -20,8 +20,8 @@ import {
 
 export default defineConfig({
   basePath: studioBasePath,
-  name: "balna",
-  title: "Balna Studio",
+  name: "minor-shop",
+  title: "Minor Shop Studio",
   projectId,
   dataset,
   schema: { types: schemaTypes },
