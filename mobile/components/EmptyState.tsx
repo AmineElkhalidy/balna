@@ -35,11 +35,11 @@ export function EmptyState({ isFiltered, settings, onClear }: EmptyStateProps) {
       style={[
         styles.wrap,
         {
-          // On tablets, stop the empty-state card from spanning the whole
-          // screen — it looks barren. Centre it inside a max-width column.
+          // Stretch to fill the available width, constrained by maxWidth so
+          // it doesn't look barren on tablets. marginHorizontal provides
+          // breathing room on both sides.
+          alignSelf: "stretch",
           maxWidth: r.contentMaxWidth,
-          alignSelf: "center",
-          width: "auto",
           marginHorizontal: r.pageGutter,
           marginTop: r.isCompact ? 16 : 24,
           padding: r.isCompact ? 20 : 28,
@@ -112,7 +112,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   icon: {
-    fontSize: 56,
+    // fontSize set inline (r.isCompact ? 44 : 56)
   },
   eyebrow: {
     marginTop: 14,
