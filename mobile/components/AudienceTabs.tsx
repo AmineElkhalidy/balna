@@ -30,7 +30,8 @@ export function AudienceTabs({ selected, onChange }: AudienceTabsProps) {
         backgroundColor: "#f3efe5",
         borderRadius: 999,
         padding: 4,
-        alignSelf: "center",
+        // Fill the width of the header row so tabs are evenly distributed
+        alignSelf: "stretch",
       }}
     >
       {tabs.map(({ key, label }) => {
@@ -43,7 +44,8 @@ export function AudienceTabs({ selected, onChange }: AudienceTabsProps) {
             accessibilityRole="tab"
             accessibilityState={{ selected: active }}
             style={({ pressed }) => ({
-              paddingHorizontal: 14,
+              flex: 1,
+              paddingHorizontal: 8,
               height: 32,
               borderRadius: 999,
               alignItems: "center",

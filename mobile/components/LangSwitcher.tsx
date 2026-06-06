@@ -33,9 +33,9 @@ export function LangSwitcher() {
       accessibilityRole="button"
       accessibilityLabel={dict.header.switchTo.replace("{language}", nextLabel)}
       style={({ pressed }) => ({
-        height: 36,
-        minWidth: 56,
-        paddingHorizontal: 12,
+        height: 34,
+        minWidth: 48,
+        paddingHorizontal: 10,
         borderRadius: 999,
         borderWidth: 1,
         borderColor: "#e7e3d8",
@@ -47,7 +47,7 @@ export function LangSwitcher() {
       <Text
         style={{
           fontFamily: "PlusJakartaSans_700Bold",
-          fontSize: 13,
+          fontSize: 12,
           color: "#0d1126",
           includeFontPadding: false,
         }}

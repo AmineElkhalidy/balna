@@ -53,9 +53,9 @@ export function CategoryFilter({ selected, onChange }: CategoryFilterProps) {
             style={({ pressed }) => ({
               flexDirection: "row",
               alignItems: "center",
-              gap: 6,
-              height: 38,
-              paddingHorizontal: 14,
+              gap: 5,
+              height: r.scale(36),
+              paddingHorizontal: r.isCompact ? 10 : 14,
               borderRadius: 999,
               borderWidth: 1,
               borderColor: active ? "#11b79f" : "#e7e3d8",
@@ -66,11 +66,11 @@ export function CategoryFilter({ selected, onChange }: CategoryFilterProps) {
                   : "#ffffff",
             })}
           >
-            {emoji ? <Text style={{ fontSize: 14 }}>{emoji}</Text> : null}
+            {emoji ? <Text style={{ fontSize: r.scale(13) }}>{emoji}</Text> : null}
             <Text
               style={{
                 fontFamily: "PlusJakartaSans_700Bold",
-                fontSize: 13,
+                fontSize: r.scale(12),
                 color: active ? "#ffffff" : "#0d1126",
                 includeFontPadding: false,
               }}

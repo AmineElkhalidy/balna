@@ -41,25 +41,30 @@ export function EmptyState({ isFiltered, settings, onClear }: EmptyStateProps) {
           alignSelf: "center",
           width: "auto",
           marginHorizontal: r.pageGutter,
+          marginTop: r.isCompact ? 16 : 24,
+          padding: r.isCompact ? 20 : 28,
         },
       ]}
     >
-      <Text style={styles.icon}>{isFiltered ? "🪧" : "🧵"}</Text>
+      <Text style={[styles.icon, { fontSize: r.isCompact ? 44 : 56 }]}>
+        {isFiltered ? "🪧" : "🧵"}
+      </Text>
       <Text style={styles.eyebrow}>{e.eyebrow}</Text>
-      <Text style={styles.title}>
+      <Text style={[styles.title, { fontSize: r.scale(r.isCompact ? 18 : 22) }]}>
         {isFiltered ? e.titleFiltered : e.titleAll}
       </Text>
-      <Text style={styles.body}>
+      <Text style={[styles.body, { fontSize: r.scale(13) }]}>
         {isFiltered ? e.bodyFiltered : e.bodyAll}
       </Text>
 
-      <View style={styles.actions}>
+      <View style={[styles.actions, r.isCompact && styles.actionsCompact]}>
         {isFiltered ? (
           <>
             <Pressable
               onPress={onClear}
               style={({ pressed }) => [
                 styles.btnSecondary,
+                r.isCompact && styles.btnFull,
                 pressed && { backgroundColor: "#f3efe5" },
               ]}
             >
@@ -69,6 +74,7 @@ export function EmptyState({ isFiltered, settings, onClear }: EmptyStateProps) {
               onPress={() => router.push("/quiz")}
               style={({ pressed }) => [
                 styles.btnPrimary,
+                r.isCompact && styles.btnFull,
                 pressed && { backgroundColor: "#0f1d3d" },
               ]}
             >
@@ -81,6 +87,7 @@ export function EmptyState({ isFiltered, settings, onClear }: EmptyStateProps) {
               onPress={() => Linking.openURL(waHref)}
               style={({ pressed }) => [
                 styles.btnWhatsApp,
+                r.isCompact && styles.btnFull,
                 pressed && { backgroundColor: "#1ebd5b" },
               ]}
             >
@@ -95,10 +102,8 @@ export function EmptyState({ isFiltered, settings, onClear }: EmptyStateProps) {
 }
 
 const styles = StyleSheet.create({
-  // `marginHorizontal` set inline (driven by useResponsive).
+  // `marginTop`, `padding`, `marginHorizontal` set inline (driven by useResponsive).
   wrap: {
-    marginTop: 36,
-    padding: 28,
     borderRadius: 24,
     borderWidth: 2,
     borderStyle: "dashed",
@@ -138,7 +143,17 @@ const styles = StyleSheet.create({
   actions: {
     marginTop: 20,
     flexDirection: "row",
+    flexWrap: "wrap",
+    justifyContent: "center",
     gap: 10,
+  },
+  actionsCompact: {
+    flexDirection: "column",
+    alignItems: "stretch",
+    width: "100%",
+  },
+  btnFull: {
+    width: "100%",
   },
   btnPrimary: {
     height: 48,

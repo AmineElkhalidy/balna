@@ -127,9 +127,9 @@ export default function CatalogScreen() {
         style={[
           styles.filterBar,
           {
-            paddingTop: r.scale(12),
-            paddingBottom: r.scale(12),
-            gap: r.scale(12),
+            paddingTop: r.scale(8),
+            paddingBottom: r.scale(8),
+            gap: r.scale(8),
           },
         ]}
       >

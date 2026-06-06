@@ -38,9 +38,9 @@ export function SortPicker({ value, onChange }: SortPickerProps) {
         style={({ pressed }) => ({
           flexDirection: "row",
           alignItems: "center",
-          gap: 6,
-          height: 36,
-          paddingHorizontal: 14,
+          gap: 5,
+          height: 34,
+          paddingHorizontal: 12,
           borderRadius: 999,
           borderWidth: 1,
           borderColor: "#e7e3d8",

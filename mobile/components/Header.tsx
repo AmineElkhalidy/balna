@@ -59,8 +59,8 @@ export function Header({
           flexDirection: "row",
           alignItems: "center",
           paddingHorizontal: r.pageGutter,
-          paddingVertical: r.scale(12),
-          gap: r.scale(12),
+          paddingVertical: r.isCompact ? r.scale(8) : r.scale(12),
+          gap: r.scale(10),
         }}
       >
         <Pressable
@@ -120,10 +120,10 @@ export function Header({
         <View
           style={{
             paddingHorizontal: r.pageGutter,
-            paddingBottom: r.scale(12),
+            paddingBottom: r.isCompact ? r.scale(8) : r.scale(12),
             borderTopColor: "#f3efe5",
             borderTopWidth: 1,
-            paddingTop: r.scale(10),
+            paddingTop: r.isCompact ? r.scale(6) : r.scale(10),
           }}
         >
           <AudienceTabs
